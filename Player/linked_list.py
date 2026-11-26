@@ -1,27 +1,13 @@
-"""Модуль со структурами данных для плеера."""
+# -*- coding: utf-8 -*-
 
 from typing import Any, Iterator, Optional
-
-
-class Composition:
-    """Музыкальная композиция."""
-
-    def __init__(self, title: str, artist: str, file_path: str) -> None:
-        self.title = title
-        self.artist = artist
-        self.file_path = file_path
-
-    def __str__(self) -> str:
-        return f"{self.artist} — {self.title}"
-
-    def __repr__(self) -> str:
-        return f"Composition({self.title!r})"
 
 
 class LinkedListItem:
     """Узел связного списка."""
 
     def __init__(self, data: Any = None) -> None:
+        """Инициализация узла."""
         self.data = data
         self._next_item = None
         self._previous_item = None
@@ -33,6 +19,7 @@ class LinkedListItem:
 
     @next_item.setter
     def next_item(self, value: Optional['LinkedListItem']) -> None:
+        """Установка следующего узла (автоматически обновляет связи)."""
         self._next_item = value
         if value is not None:
             value._previous_item = self
@@ -44,11 +31,13 @@ class LinkedListItem:
 
     @previous_item.setter
     def previous_item(self, value: Optional['LinkedListItem']) -> None:
+        """Установка предыдущего узла (автоматически обновляет связи)."""
         self._previous_item = value
         if value is not None:
             value._next_item = self
 
     def __repr__(self) -> str:
+        """Строковое представление узла."""
         return f"LinkedListItem({self.data})"
 
 
@@ -56,6 +45,7 @@ class LinkedList:
     """Кольцевой двусвязный список."""
 
     def __init__(self, first_item: Optional[LinkedListItem] = None) -> None:
+        """Инициализация списка."""
         self.first_item = first_item
 
     @property
@@ -95,7 +85,7 @@ class LinkedList:
         self.append_right(item)
 
     def remove(self, item: Any) -> None:
-        """Удалить элемент по данным. ValueError, если нет."""
+        """Удалить элемент по данным. Вызывает ValueError, если нет."""
         if self.first_item is None:
             raise ValueError(f"{item} нет в списке")
         current = self.first_item
@@ -131,6 +121,7 @@ class LinkedList:
         nxt.previous_item = new_item
 
     def __len__(self) -> int:
+        """Длина списка."""
         if self.first_item is None:
             return 0
         count = 1
@@ -141,6 +132,7 @@ class LinkedList:
         return count
 
     def __iter__(self) -> Iterator[LinkedListItem]:
+        """Итератор по узлам списка."""
         if self.first_item is None:
             return
         current = self.first_item
@@ -151,6 +143,7 @@ class LinkedList:
                 break
 
     def __getitem__(self, index: int) -> Any:
+        """Получение данных по индексу."""
         length = len(self)
         if index < 0:
             index += length
@@ -162,6 +155,7 @@ class LinkedList:
         return current.data
 
     def __contains__(self, item: Any) -> bool:
+        """Проверка наличия данных в списке."""
         if self.first_item is None:
             return False
         current = self.first_item
@@ -173,6 +167,7 @@ class LinkedList:
                 return False
 
     def __reversed__(self) -> Iterator[Any]:
+        """Обратный итератор по данным."""
         if self.first_item is None:
             return
         last = self.first_item.previous_item
@@ -182,50 +177,3 @@ class LinkedList:
             current = current.previous_item
             if current is last:
                 break
-
-
-class PlayList(LinkedList):
-    """Плейлист с текущим треком."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.current_item = None
-
-    def play_all(self, item: Optional[Composition] = None) -> Optional[Composition]:
-        """Начать проигрывание с указанного трека (или с начала)."""
-        if self.first_item is None:
-            self.current_item = None
-            return None
-        if item is None:
-            self.current_item = self.first_item
-            return self.current_item.data
-        current = self.first_item
-        while True:
-            if current.data == item:
-                self.current_item = current
-                return self.current_item.data
-            current = current.next_item
-            if current is self.first_item:
-                self.current_item = self.first_item
-                return self.current_item.data
-
-    def next_track(self) -> Optional[Composition]:
-        """Переключить на следующий трек."""
-        if self.current_item is None:
-            return None
-        self.current_item = self.current_item.next_item
-        return self.current_item.data
-
-    def previous_track(self) -> Optional[Composition]:
-        """Переключить на предыдущий трек."""
-        if self.current_item is None:
-            return None
-        self.current_item = self.current_item.previous_item
-        return self.current_item.data
-
-    @property
-    def current(self) -> Optional[Composition]:
-        """Текущий трек."""
-        if self.current_item is None:
-            return None
-        return self.current_item.data
