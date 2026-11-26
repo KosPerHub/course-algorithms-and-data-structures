@@ -1,20 +1,30 @@
+# -*- coding: utf-8 -*-
+"""Простой музыкальный плеер на tkinter и pygame."""
+
 import os
 import tkinter as tk
+import tkinter.font as tkfont
 from tkinter import filedialog, messagebox, simpledialog
 
 import pygame
 
-from linked_list import Composition, PlayList
+from composition import Composition
+from playlist import PlayList
 
 
 class PlayerApp:
     """Графический интерфейс плеера."""
 
     def __init__(self, root: tk.Tk) -> None:
+        """Инициализация интерфейса."""
         self.root = root
         self.root.title("Простой плеер")
         self.playlist = PlayList()
         self.is_playing = False
+
+        # Фикс шрифта для корректного отображения кириллицы
+        default_font = tkfont.nametofont("TkDefaultFont")
+        default_font.configure(family="Segoe UI", size=10)
 
         pygame.mixer.init()
 
@@ -78,6 +88,7 @@ class PlayerApp:
             pygame.mixer.music.stop()
             self.playlist.current_item = None
             self.is_playing = False
+            self.status.config(text="Трек не выбран")
         self.playlist.remove(comp)
         self.update_list()
 
@@ -169,7 +180,7 @@ class PlayerApp:
 
 
 def main() -> None:
-    """Точка входа."""
+    """Точка входа в программу."""
     root = tk.Tk()
     PlayerApp(root)
     root.mainloop()
